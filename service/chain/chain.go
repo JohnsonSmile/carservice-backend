@@ -1,10 +1,11 @@
-package client
+package chain
 
 import (
 	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"strings"
 
 	"chainmaker.org/chainmaker/common/v2/evmutils"
@@ -13,27 +14,25 @@ import (
 	sdk "chainmaker.org/chainmaker/sdk-go/v2"
 )
 
-var Client *ChainClient
-
 type ChainClient struct {
 	client *sdk.ChainClient
 }
 
 type Option = func(*ChainClient)
 
-func NewChainClient(opts ...Option) error {
+func NewChainClient(opts ...Option) (*ChainClient, error) {
 	cli, err := createClientWithConfig()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	Client = &ChainClient{
+	client := &ChainClient{
 		client: cli,
 	}
 
 	for _, opt := range opts {
-		opt(Client)
+		opt(client)
 	}
-	return nil
+	return client, nil
 }
 
 // options
@@ -98,8 +97,11 @@ func (cc *ChainClient) TokenContractBalanceOf(address string) error {
 	} else {
 		fmt.Printf("合约已存在 %+v \n\n", contract)
 	}
-
-	abiJson, err := os.ReadFile("./contracts/token/token.abi")
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	abiJson, err := os.ReadFile(path.Join(dir, "contracts/token/token.abi"))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -136,7 +138,7 @@ func (cc *ChainClient) TokenContractBalanceOf(address string) error {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Printf("addr [%s] => %d\n", address, balance)
+	fmt.Printf("addr [%s] => %+v\n", address, balance)
 	return nil
 }
 
@@ -149,7 +151,7 @@ func invokeTokenContractWithResult(client *sdk.ChainClient, contractName, method
 	}
 
 	if resp.Code != common.TxStatusCode_SUCCESS {
-		return nil, fmt.Errorf("invoke contract failed, [code:%d]/[msg:%s]\n", resp.Code, resp.Message)
+		return nil, fmt.Errorf("invoke contract failed, [code:%d]/[msg:%s]", resp.Code, resp.Message)
 	}
 
 	return resp.ContractResult.Result, nil

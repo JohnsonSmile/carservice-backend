@@ -1,0 +1,48 @@
+port: 8081
+mysql:
+  username: "root"
+  password: "123456"
+  address: "127.0.0.1"
+  port: 13306
+  database: "carservice"
+jwt:
+  key: "Y2Fyc2VydmljZQ=="
+rsa:
+  private_key: |-
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpAIBAAKCAQEA5mKq/BgAqS5liqU56pec050MBS2QSLhmU/iFPCfj0c+ClF1q
+    kCsY+0I4p2fePSgxgnE+GjvYnMTa8P2eEWhHmemqoEvaFrp6WtRzOH1BrkIf1DXt
+    KxyE/NEcYa2xpeGzI+gJCLGOvEGQGMFFFf0Snpz5o87rkAaKk1ZeMFNp1Gu02gXa
+    na8wUHU+K2XSsjVqHR1dzNjfNSNiDlcx5gh4erympJhuCaNSe6LOcttW53aYgs20
+    F99KJriAP2GTSJfr6ATudeK3psdm/rTkM/mi2XWHCCsdSVpTLkP4IRcpn4WdmoLk
+    Hsde0Ea7n6io5H73Eco+uOT/UCOlayncH3epMQIDAQABAoIBAQDEqaVb3QFzae+0
+    EqcF4rY0zfLc2LA54282bwcM+uA20fSdwcCdoKyKj1TdUoUbn5vjxddFfaDC8igT
+    X+v24BV/BUBp5VYd4MFhl8ljh0jx//A7rmzuSEIdrkOT/jmPaMMK+5/6k9dMTIs9
+    Fn5q7sVeMJHJi3D6WRsh+rAcgJfugwPHO7VsJs2+hgmtmvzHxpTU5EvlrIr+Iu2a
+    K/Gt9B94tKCALwmNMGgaMiRJovvCKvApNtEYjVJUmCaKofFS/M1ZOSJeQ19pGDMk
+    BAqCyzx7ykwrzgJZQc4icvOyJcWBXYPVmEKPR4cDoU063NF2h5e3b8IORsTlYxF6
+    syvgZNmhAoGBAPyA/tBdjFw1K1LZ36oiw/V/V1JDr/5kBWpYCkOremzhAM0LNDNf
+    Lld+0t4ddyaWOqT9zfSNyUQaiDuwRT0uAye50zoU8KQWEMnSnrbCiGDWBe3xw38c
+    kVWokujkLL7z29g7widXk8bcOHj3xTUL/dAQgUC0sbx0v1OONUM8ZD2TAoGBAOmT
+    RfKs89Cte+Nk+momN1/FO17GAA6jSxaWAVE+qj7LBqvajlIJ/rZV5+yLrzXlEDsI
+    WnPM3cfOIGb1NVJPhmC5tt5C09lNLFzVJXMmcV75jq2rf9MA8kAXwLMb2hdRaRju
+    mo31ZC4kRFz1O11/3yIanstu303uIqZwGTY2SFirAoGAbZIwgQzHNtAfv7Ep3LN/
+    Y43hv6H9wh93NiGEOr8zvgGZjmC5Qz2fZ3pyWM5igQ0Z37T/ZYsNdo8o5PXl5dmM
+    pvV9Uqv5jMrCeEH8e4RJF/Rn2ExcMFGeQ5SGQ6eYPzilAt1TsCzRxK6VlvC11AIj
+    HuG6pPCEXCoxSDnipQ2U1h8CgYB9zYalGCYRxP6vERoWxhKZEH/Toc0yFR1CQvTe
+    r2O+gldLhGGXKi74QfiyXOG3o3JEeVFOgY8KKKknCvb3KEH2ItCtkUzNA1Xbgimz
+    hYcWYk9IltA385CGmMR/M4cZfA2hEhJIV1znxTzU3Hhm+ZJSqgfRBhxbuuEKx+Gs
+    YzxAFQKBgQC0gT+vvrz3n7by/HKVsmGYdfiTPiWtFIUJ9G/jLIZUlUXPZzGmjEIT
+    GjXsG5WyClCSV6pIZSLSc3/HWF2iUJmTZ+81/Q2iNZE9RdayMHoNVTgH277xa1T8
+    QZF0P5jmmazf5OIGgIeHPCFCW4DOevjITWnQjsRGGvHxTGZT1zvY8A==
+    -----END RSA PRIVATE KEY-----
+
+  public_key: |-
+    -----BEGIN RSA PUBLIC KEY-----
+    MIIBCgKCAQEA5mKq/BgAqS5liqU56pec050MBS2QSLhmU/iFPCfj0c+ClF1qkCsY
+    +0I4p2fePSgxgnE+GjvYnMTa8P2eEWhHmemqoEvaFrp6WtRzOH1BrkIf1DXtKxyE
+    /NEcYa2xpeGzI+gJCLGOvEGQGMFFFf0Snpz5o87rkAaKk1ZeMFNp1Gu02gXana8w
+    UHU+K2XSsjVqHR1dzNjfNSNiDlcx5gh4erympJhuCaNSe6LOcttW53aYgs20F99K
+    JriAP2GTSJfr6ATudeK3psdm/rTkM/mi2XWHCCsdSVpTLkP4IRcpn4WdmoLkHsde
+    0Ea7n6io5H73Eco+uOT/UCOlayncH3epMQIDAQAB
+    -----END RSA PUBLIC KEY-----
