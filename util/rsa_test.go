@@ -136,17 +136,17 @@ func TestGenerateQRCodeData(t *testing.T) {
 /*
 === RUN   TestGenerateQRCodeText
 === RUN   TestGenerateQRCodeText/car:highway:start
-    rsa_test.go:178: targetText: car:highway:Y2FyOmhpZ2h3YXk6c3RhcnQ6MToxOjEwMDE
+    rsa_test.go:194: targetText: car:highway:start:Y2FyOmhpZ2h3YXk6c3RhcnQ6MToxOjEwMDE
 === RUN   TestGenerateQRCodeText/car:highway:end
-    rsa_test.go:178: targetText: car:highway:Y2FyOmhpZ2h3YXk6ZW5kOjE6MToxMDEx
+    rsa_test.go:194: targetText: car:highway:end:Y2FyOmhpZ2h3YXk6ZW5kOjE6MToxMDEx
 === RUN   TestGenerateQRCodeText/car:charge:start
-    rsa_test.go:178: targetText: car:charge:Y2FyOmNoYXJnZTpzdGFydDoxOjE6MTE
+    rsa_test.go:194: targetText: car:charge:start:Y2FyOmNoYXJnZTpzdGFydDoxOjE6MTE
 === RUN   TestGenerateQRCodeText/car:charge:end
-    rsa_test.go:178: targetText: car:charge:Y2FyOmNoYXJnZTplbmQ6MToxOjEx
+    rsa_test.go:194: targetText: car:charge:end:Y2FyOmNoYXJnZTplbmQ6MToxOjEx
 === RUN   TestGenerateQRCodeText/car:park:start
-    rsa_test.go:178: targetText: car:park:Y2FyOnBhcms6c3RhcnQ6MToxOjIx
+    rsa_test.go:194: targetText: car:park:start:Y2FyOnBhcms6c3RhcnQ6MToxOjIx
 === RUN   TestGenerateQRCodeText/car:park:end
-    rsa_test.go:178: targetText: car:park:Y2FyOnBhcms6ZW5kOjE6MToyMQ
+    rsa_test.go:194: targetText: car:park:end:Y2FyOnBhcms6ZW5kOjE6MToyMQ
 */
 
 func TestGenerateQRCodeText(t *testing.T) {
@@ -190,8 +190,18 @@ func TestGenerateQRCodeText(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			bcryptText := base64.RawStdEncoding.EncodeToString([]byte(tt.text))
-			targetText := tt.codeType + ":" + bcryptText
+			targetText := tt.name + ":" + bcryptText
 			t.Logf("targetText: %s\n", targetText)
 		})
 	}
+}
+
+
+func TestDemo(t *testing.T) {
+	s, err := util.RsaDecryptBase64("Y2FyOmhpZ2h3YXk6c3RhcnQ6MToxOjEwMDE")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(s)
 }

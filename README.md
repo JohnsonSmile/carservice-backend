@@ -1,4 +1,11 @@
 
+
+服务器部署：
+```bash
+docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp golang:1.20 bash -c 'go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && go build -v'
+nohup ./carservice &
+```
+
 下载配置文件：
 ![download-config](images/download-config.png)
 

@@ -10,3 +10,7 @@ type LoginRequest struct {
 	Phone    string `json:"phone" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+type PreviewRequest struct {
+	Data string `json:"data" binding:"required"`
+}

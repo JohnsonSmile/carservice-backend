@@ -149,3 +149,7 @@ func Register(c *gin.Context) {
 func GetUserInfo(c *gin.Context) {
 	zap.L().Debug("GetUserInfo")
 }
+
+func UpdateUserInfo(c *gin.Context) {
+	zap.L().Debug("GetUserInfo")
+}

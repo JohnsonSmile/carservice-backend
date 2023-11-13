@@ -75,6 +75,16 @@ func Initialize(isDebug bool) {
 		panic(err)
 	}
 	// 自动迁移
-	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(
+		&model.User{},
+		&model.Order{},
+		&model.OrderType{},
+		&model.Position{},
+		&model.City{},
+		&model.Region{},
+		&model.Place{},
+		&model.HighWayFee{},
+		&model.ParkFee{},
+		&model.ChargeFee{})
 	initialized = true
 }
