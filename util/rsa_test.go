@@ -138,7 +138,7 @@ func TestGenerateQRCodeData(t *testing.T) {
 === RUN   TestGenerateQRCodeText/car:highway:start
     rsa_test.go:194: targetText: car:highway:start:Y2FyOmhpZ2h3YXk6c3RhcnQ6MToxOjEwMDE
 === RUN   TestGenerateQRCodeText/car:highway:end
-    rsa_test.go:194: targetText: car:highway:end:Y2FyOmhpZ2h3YXk6ZW5kOjE6MToxMDEx
+    rsa_test.go:194: targetText: car:highway:end:Y2FyOmhpZ2h3YXk6ZW5kOjI6MjoxMDEx
 === RUN   TestGenerateQRCodeText/car:charge:start
     rsa_test.go:194: targetText: car:charge:start:Y2FyOmNoYXJnZTpzdGFydDoxOjE6MTE
 === RUN   TestGenerateQRCodeText/car:charge:end
@@ -162,7 +162,7 @@ func TestGenerateQRCodeText(t *testing.T) {
 		},
 		{
 			name:     "car:highway:end",
-			text:     "car:highway:end:1:1:1011",
+			text:     "car:highway:end:2:2:1011",
 			codeType: "car:highway",
 		},
 		{
@@ -195,7 +195,6 @@ func TestGenerateQRCodeText(t *testing.T) {
 		})
 	}
 }
-
 
 func TestDemo(t *testing.T) {
 	s, err := util.RsaDecryptBase64("Y2FyOmhpZ2h3YXk6c3RhcnQ6MToxOjEwMDE")

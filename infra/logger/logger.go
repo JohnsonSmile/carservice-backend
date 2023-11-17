@@ -73,7 +73,7 @@ func (l *ZapLogger) Debug(msg string, kvs map[string]any) {
 }
 
 func (l *ZapLogger) Debugf(msg string, args ...any) {
-	l.logger.Debug(fmt.Sprintf(msg, args))
+	l.logger.Debug(fmt.Sprintf(msg, args...))
 }
 
 func (l *ZapLogger) Info(msg string, kvs map[string]any) {
@@ -85,7 +85,7 @@ func (l *ZapLogger) Info(msg string, kvs map[string]any) {
 }
 
 func (l *ZapLogger) Infof(msg string, args ...any) {
-	l.logger.Info(fmt.Sprintf(msg, args))
+	l.logger.Info(fmt.Sprintf(msg, args...))
 }
 
 func (l *ZapLogger) Error(msg string, err error) {
@@ -93,7 +93,7 @@ func (l *ZapLogger) Error(msg string, err error) {
 }
 
 func (l *ZapLogger) Errorf(msg string, args ...any) {
-	l.logger.Error(fmt.Sprintf(msg, args))
+	l.logger.Error(fmt.Sprintf(msg, args...))
 }
 
 func (l *ZapLogger) Panic(msg string, err error) {
@@ -101,7 +101,7 @@ func (l *ZapLogger) Panic(msg string, err error) {
 }
 
 func (l *ZapLogger) Panicf(msg string, args ...any) {
-	l.logger.Panic(fmt.Sprintf(msg, args))
+	l.logger.Panic(fmt.Sprintf(msg, args...))
 }
 
 func (l *ZapLogger) Shutdown() error {

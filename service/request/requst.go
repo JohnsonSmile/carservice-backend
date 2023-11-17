@@ -14,3 +14,17 @@ type LoginRequest struct {
 type PreviewRequest struct {
 	Data string `json:"data" binding:"required"`
 }
+
+type StartRequest struct {
+	PositionID int `json:"position_id" binding:"required"`
+}
+
+type EndRequest struct {
+	OrderSn    string `json:"order_sn" binding:"required"`
+	PositionID int    `json:"position_id" binding:"required"` // end positionID
+}
+
+type HighwayOrdersRequest struct {
+	Page int `form:"page" binding:"required"`
+	Size int `form:"size" binding:"required"`
+}

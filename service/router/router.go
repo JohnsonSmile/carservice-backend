@@ -50,6 +50,7 @@ func Initialize(isDebug bool) *gin.Engine {
 
 		// order
 		apiGroup.POST("/order/pay", middleware.JWTAuth(), handler.PayOrder)
+		apiGroup.GET("/highway/orders", middleware.JWTAuth(), handler.GetHighWayOrders)
 
 	}
 

@@ -3,10 +3,12 @@ package handler
 import (
 	"carservice/infra/database"
 	"carservice/infra/logger"
+	"carservice/model"
 	"carservice/service/request"
 	"carservice/service/response"
 	"encoding/base64"
-	"log"
+	"encoding/hex"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -48,7 +50,6 @@ func PreviewHighWay(c *gin.Context) {
 	// 从context中获取用户id
 	userId := c.GetUint("userId")
 	if userId == 0 {
-		logger.Error("param error", err)
 		c.JSON(http.StatusBadRequest, &response.Response{
 			Code: http.StatusBadRequest,
 			Msg:  "params error",
@@ -82,7 +83,8 @@ func PreviewHighWay(c *gin.Context) {
 		cityID := strs[3]
 		regionID := strs[4]
 		placeID := strs[5]
-		position, err := database.GetPosition(cityID, regionID, placeID)
+		position, err := database.GetPosition(1, cityID, regionID, placeID)
+
 		if err != nil {
 			logger.Error("get position error", err)
 			c.JSON(http.StatusBadRequest, &response.Response{
@@ -91,14 +93,15 @@ func PreviewHighWay(c *gin.Context) {
 			})
 			return
 		}
-		log.Println("error:", err)
 		// seperat
 		c.JSON(http.StatusOK, &response.Response{
 			Code: http.StatusOK,
 			Msg:  "success",
 			Data: gin.H{
 				"start_positon": position.Name,
+				"start_id":      position.ID,
 				"end_positon":   "",
+				"end_id":        0,
 				"order_sn":      "",
 				"status":        -1, // -1 表示没有订单,not created
 				"price":         0,
@@ -120,16 +123,46 @@ func PreviewHighWay(c *gin.Context) {
 			})
 			return
 		}
+
+		// get current end position
+
+		// TODO: find position
+		cityID := strs[3]
+		regionID := strs[4]
+		placeID := strs[5]
+		position, err := database.GetPosition(1, cityID, regionID, placeID)
+		if err != nil {
+			logger.Error("get position error", err)
+			c.JSON(http.StatusBadRequest, &response.Response{
+				Code: http.StatusBadRequest,
+				Msg:  "get position error",
+			})
+			return
+		}
+
+		// query fee
+		fee, err := database.GetHighwayFee(order.StartPositionID, position.ID)
+		if err != nil {
+			logger.Error("get fee error", err)
+			c.JSON(http.StatusBadRequest, &response.Response{
+				Code: http.StatusBadRequest,
+				Msg:  "get fee error",
+			})
+			return
+		}
+
 		// end status
 		c.JSON(http.StatusOK, &response.Response{
 			Code: http.StatusOK,
 			Msg:  "ready to pay",
 			Data: gin.H{
 				"start_positon": order.StartPosition.Name,
-				"end_positon":   order.EndPosition.Name,
+				"start_id":      order.StartPosition.ID,
+				"end_positon":   position.Name,
+				"end_id":        position.ID,
 				"order_sn":      order.OrderSn,
 				"status":        order.OrderStatus,
-				"price":         order.Fee,
+				"price":         fee,
 				"start_at":      order.StartAt,
 				"end_at":        time.Now(), // 只是preview，并不更改数据库
 				// TODO: 数字人民币的支付
@@ -146,7 +179,9 @@ func PreviewHighWay(c *gin.Context) {
 				Msg:  "you should pay previous order first.",
 				Data: gin.H{
 					"start_positon": order.StartPosition.Name,
+					"start_id":      order.StartPosition.ID,
 					"end_positon":   order.EndPosition.Name,
+					"end_id":        order.EndPosition.ID,
 					"order_sn":      order.OrderSn,
 					"status":        order.OrderStatus,
 					"price":         order.Fee,
@@ -164,7 +199,9 @@ func PreviewHighWay(c *gin.Context) {
 				Msg:  "ready to pay",
 				Data: gin.H{
 					"start_positon": order.StartPosition.Name,
+					"start_id":      order.StartPosition.ID,
 					"end_positon":   order.EndPosition.Name,
+					"end_id":        order.EndPosition.ID,
 					"order_sn":      order.OrderSn,
 					"status":        order.OrderStatus,
 					"price":         order.Fee,
@@ -181,11 +218,240 @@ func PreviewHighWay(c *gin.Context) {
 }
 
 func StartHighWay(c *gin.Context) {
+	req := request.StartRequest{}
+	if err := c.ShouldBind(&req); err != nil {
+		logger.Error("param error", err)
+		HandleValidatorError(c, err)
+		return
+	}
+
+	// user id
+	// 从context中获取用户id
+	userId := c.GetUint("userId")
+	if userId == 0 {
+		c.JSON(http.StatusBadRequest, &response.Response{
+			Code: http.StatusBadRequest,
+			Msg:  "params error",
+		})
+		return
+	}
+
+	// 查看当前用户有没有未完成的highway订单，如果有则状态异常,提示用户完成之前的订单，或者可能他走错口了？？
+	order, err := database.GetLatestUnFinishedHighwayOrderByUserId(userId)
+	if err != nil {
+		logger.Error("get unfinished highway order", err)
+		c.JSON(http.StatusInternalServerError, &response.Response{
+			Code: http.StatusInternalServerError,
+			Msg:  "get unfinished highway order error",
+		})
+		return
+	}
+	if order != nil {
+		// not finished order
+		c.JSON(http.StatusOK, &response.Response{
+			Code: http.StatusOK, // TODO: code to deal
+			Msg:  "previous order not finished",
+			Data: gin.H{
+				"start_positon": order.StartPosition.Name,
+				"start_id":      order.StartPosition.ID,
+				"end_positon":   order.EndPosition.Name,
+				"end_id":        order.EndPosition.ID,
+				"order_sn":      order.OrderSn,
+				"status":        order.OrderStatus,
+				"price":         order.Fee,
+				"start_at":      order.StartAt,
+				"end_at":        order.EndAt,
+				// TODO: 数字人民币的支付
+			},
+		})
+		return
+	}
+
+	now := time.Now()
+	// ETC 2023(年) 11(月) 11(日) 06(时) 10(分) 12(秒) XXXX(用户id.hex())
+	userIdHex := hex.EncodeToString([]byte(fmt.Sprintf("%d", userId)))
+	orderSn := fmt.Sprintf("ETC%d%d%d%d%d%d%06s", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second(), userIdHex)
+
+	newOrder := &model.Order{
+		OrderSn:         orderSn, // TODO: generate order sn with type
+		OrderTypeID:     1,
+		OrderStatus:     0,
+		UserID:          int(userId),
+		StartAt:         &now,
+		EndAt:           nil,
+		Fee:             0,
+		StartPositionID: req.PositionID,
+		EndPositionID:   0,
+	}
+
+	if err := database.CreateOrder(newOrder); err != nil {
+		c.JSON(http.StatusOK, &response.Response{
+			Code: http.StatusBadRequest,
+			Msg:  "create order failed.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, &response.Response{
+		Code: http.StatusOK,
+		Msg:  "success",
+		Data: gin.H{
+			"start_positon": order.StartPosition.Name,
+			"start_id":      order.StartPosition.ID,
+			"end_positon":   "",
+			"end_id":        0,
+			"order_sn":      order.OrderSn,
+			"status":        order.OrderStatus,
+			"price":         order.Fee,
+			"start_at":      order.StartAt,
+			"end_at":        order.EndAt,
+			// TODO: 数字人民币的支付
+		},
+	})
 
 }
 
 func EndHighWay(c *gin.Context) {
+	req := request.EndRequest{}
+	if err := c.ShouldBind(&req); err != nil {
+		logger.Error("param error", err)
+		HandleValidatorError(c, err)
+		return
+	}
 
+	// user id
+	// 从context中获取用户id
+	userId := c.GetUint("userId")
+	if userId == 0 {
+		c.JSON(http.StatusBadRequest, &response.Response{
+			Code: http.StatusBadRequest,
+			Msg:  "params error",
+		})
+		return
+	}
+
+	// get order with order sn
+	order, err := database.GetHighwayOrderByOrderSn(req.OrderSn)
+	if err != nil {
+		logger.Error("get highway order by order sn", err)
+		c.JSON(http.StatusInternalServerError, &response.Response{
+			Code: http.StatusInternalServerError,
+			Msg:  "get highway order by order sn error",
+		})
+		return
+	}
+
+	if order.EndPositionID > 0 {
+		// 说明已经end过了，提示前端支付
+		c.JSON(http.StatusOK, &response.Response{
+			Code: http.StatusOK,
+			Msg:  "success",
+			Data: gin.H{
+				"start_positon": order.StartPosition.Name,
+				"start_id":      order.StartPosition.ID,
+				"end_positon":   order.EndPosition.Name,
+				"end_id":        order.EndPosition.ID,
+				"order_sn":      order.OrderSn,
+				"status":        order.OrderStatus,
+				"price":         order.Fee,
+				"start_at":      order.StartAt,
+				"end_at":        order.EndAt, // 应该已经写入了
+				// TODO: 数字人民币的支付
+			},
+		})
+		return
+	}
+
+	// update order status and end
+
+	position, err := database.GetPositionByID(req.PositionID)
+	if err != nil {
+		logger.Error("get position error", err)
+		c.JSON(http.StatusBadRequest, &response.Response{
+			Code: http.StatusBadRequest,
+			Msg:  "get position error",
+		})
+		return
+	}
+	order.EndPositionID = position.ID
+
+	// query fee
+	fee, err := database.GetHighwayFee(order.StartPositionID, position.ID)
+
+	if err != nil {
+		logger.Error("get fee error", err)
+		c.JSON(http.StatusBadRequest, &response.Response{
+			Code: http.StatusBadRequest,
+			Msg:  "get fee error",
+		})
+		return
+	}
+	order.Fee = fee
+	now := time.Now()
+	order.EndAt = &now
+	err = database.EndOrder(order)
+	if err != nil {
+		c.JSON(http.StatusOK, &response.Response{
+			Code: http.StatusInternalServerError,
+			Msg:  "end order failed",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, &response.Response{
+		Code: http.StatusOK,
+		Msg:  "success",
+		Data: gin.H{
+			"start_positon": order.StartPosition.Name,
+			"start_id":      order.StartPosition.ID,
+			"end_positon":   position.Name,
+			"end_id":        position.ID,
+			"order_sn":      order.OrderSn,
+			"status":        2,
+			"price":         order.Fee,
+			"start_at":      order.StartAt,
+			"end_at":        now,
+			// TODO: 数字人民币的支付
+
+		},
+	})
+}
+
+func GetHighWayOrders(c *gin.Context) {
+	req := request.HighwayOrdersRequest{}
+	if err := c.ShouldBindQuery(&req); err != nil {
+		logger.Error("param error", err)
+		HandleValidatorError(c, err)
+		return
+	}
+
+	// user id
+	// 从context中获取用户id
+	userId := c.GetUint("userId")
+	if userId == 0 {
+		c.JSON(http.StatusBadRequest, &response.Response{
+			Code: http.StatusBadRequest,
+			Msg:  "params error",
+		})
+		return
+	}
+
+	orders, total, err := database.GetHighwayOrders(req.Page, req.Size)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &response.Response{
+			Code: http.StatusInternalServerError,
+			Msg:  "get highway orders failed",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, &response.Response{
+		Code: http.StatusOK,
+		Msg:  "success",
+		Data: gin.H{
+			"orders": orders,
+			"total":  total,
+		},
+	})
 }
 
 // charge
