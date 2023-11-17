@@ -49,7 +49,7 @@ go test -v util/rsa_test.go -run TestGenerateQRCodeText
 ## highway Qrcode
 
 start code:
-![高速入口]("/images/car_highway_start.png")
+![高速入口](images/car_highway_start.png)
 
 end code:
-![高速出口]("/images/car_highway_end.png")
+![高速出口](images/car_highway_end.png)
