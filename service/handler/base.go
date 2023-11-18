@@ -11,14 +11,14 @@ import (
 func HandleValidatorError(c *gin.Context, err error) {
 	errs, ok := err.(validator.ValidationErrors)
 	if !ok {
-		c.JSON(http.StatusBadRequest, response.Response{
-			Code: http.StatusBadRequest,
-			Msg:  err.Error(),
+		c.JSON(http.StatusOK, &response.Response{
+			Code: response.PARAM_ERROR,
+			Msg:  response.MsgForCode(response.PARAM_ERROR),
 		})
 		return
 	}
-	c.JSON(http.StatusBadRequest, gin.H{
-		"code":    http.StatusBadRequest,
-		"message": errs.Error(),
+	c.JSON(http.StatusOK, &response.Response{
+		Code: response.PARAM_ERROR,
+		Msg:  errs.Error(),
 	})
 }

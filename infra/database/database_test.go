@@ -71,6 +71,7 @@ func TestPrePareHighwayData(t *testing.T) {
 		RegionID:  1,
 		Longitude: 24.15,
 		Latitude:  113.23,
+		PlaceType: 1,
 	}
 	highStartPlace.ID = 1001
 
@@ -155,4 +156,46 @@ func TestPrePareHighwayData(t *testing.T) {
 		return
 	}
 
+}
+
+func TestPrePareChargeData(t *testing.T) {
+
+	chargePlace := model.Place{
+		Name:      "万象城-001",
+		RegionID:  1,
+		Longitude: 24.15,
+		Latitude:  113.23,
+		PlaceType: 2, // charge
+	}
+	chargePlace.ID = 11
+
+	if err := database.CreatePlace(&chargePlace); err != nil {
+		t.Error(err)
+		return
+	}
+
+	// charge position
+	chargePosition := model.Position{
+		PlaceID:  11,
+		CityID:   1,
+		RegionID: 1,
+		Name:     "宝安区-万象城-001",
+		// 1-highway;2-charge;3-park
+		OrderTypeID: 2,
+	}
+
+	if err := database.CreatePosition(&chargePosition); err != nil {
+		t.Error(err)
+		return
+	}
+
+	// TODO: fee 按时间收费
+	fee := model.ChargeFee{
+		PositionID:   3,
+		FeePerDegree: 205,
+	}
+	if err := database.CreateChargeFee(&fee); err != nil {
+		t.Error(err)
+		return
+	}
 }

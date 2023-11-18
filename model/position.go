@@ -26,7 +26,7 @@ type Region struct {
 
 type Place struct {
 	BaseModel
-	PlaceType int     `gorm:"column:place_type;type:tinyint(1);not null;default 0 comment '地点类型:0-highway;1-charge;3-park'" json:"place_type"`
+	PlaceType int     `gorm:"column:place_type;type:tinyint(1);not null;default 0 comment '地点类型:1-highway;2-charge;3-park'" json:"place_type"`
 	Name      string  `gorm:"column:name;type:varchar(255);not null" json:"name"`
 	Region    Region  `gorm:"foreignKey:RegionID" json:"region"`
 	RegionID  int     `gorm:"column:region_id;type:int(11);not null;default 0" json:"region_id"`

@@ -11,7 +11,9 @@ type HighWayFee struct {
 
 type ChargeFee struct {
 	BaseModel
-	FeePerDegree int `gorm:"column:fee_per_degree;type:int(11);not null;default 0 comment '费用/度'" json:"fee_per_degree"`
+	PositionID   int      `gorm:"column:position_id;type:int(11);not null;default 0 comment '位置id'" json:"position_id"`
+	Position     Position `gorm:"foreignKey:PositionID;references:ID" json:"position"`
+	FeePerDegree int      `gorm:"column:fee_per_degree;type:int(11);not null;default 0 comment '费用/度'" json:"fee_per_degree"`
 }
 
 type ParkFee struct {
