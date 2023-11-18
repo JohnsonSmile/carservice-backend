@@ -199,3 +199,45 @@ func TestPrePareChargeData(t *testing.T) {
 		return
 	}
 }
+
+func TestPrePareParkData(t *testing.T) {
+
+	parkPlace := model.Place{
+		Name:      "前海湾-001",
+		RegionID:  1,
+		Longitude: 24.15,
+		Latitude:  113.23,
+		PlaceType: 3, // park
+	}
+	parkPlace.ID = 21
+
+	if err := database.CreatePlace(&parkPlace); err != nil {
+		t.Error(err)
+		return
+	}
+
+	// park position
+	parkPosition := model.Position{
+		PlaceID:  21,
+		CityID:   1,
+		RegionID: 1,
+		Name:     "宝安区-前海湾-001",
+		// 1-highway;2-charge;3-park
+		OrderTypeID: 3,
+	}
+
+	if err := database.CreatePosition(&parkPosition); err != nil {
+		t.Error(err)
+		return
+	}
+
+	// TODO: fee 按时间收费
+	fee := model.ParkFee{
+		PositionID: 4,
+		FeePerHour: 100, // 1.00元
+	}
+	if err := database.CreateParkFee(&fee); err != nil {
+		t.Error(err)
+		return
+	}
+}

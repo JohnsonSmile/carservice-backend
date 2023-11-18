@@ -38,6 +38,7 @@ addr [470532945834136871529055253531705118185281158937] => [%!d(string=0)]
 ```
 go test -v infra/database/database_test.go -run TestPrePareHighwayData
 go test -v infra/database/database_test.go -run TestPrePareChargeData
+go test -v infra/database/database_test.go -run TestPrePareParkData
 ```
 
 生成 QRCode 的 text，然后去草料二维码生成二维码
@@ -60,3 +61,9 @@ go test -v util/rsa_test.go -run TestGenerateQRCodeText
 
 充电桩，结束充电
 ![结束充电](images/car_charge_end.png)
+
+停车，开始停车
+![开始停车](images/car_park_start.png)
+
+停车，结束停车
+![结束停车](images/car_park_end.png)

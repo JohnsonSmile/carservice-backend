@@ -23,3 +23,13 @@ func GetChargeFee(positionID int) (int, error) {
 	err := db.Model(&model.ChargeFee{}).Select("FeePerDegree").Where("position_id = ?", positionID).First(&fee).Error
 	return fee, err
 }
+
+func CreateParkFee(fee *model.ParkFee) error {
+	return db.Create(fee).Error
+}
+
+func GetParkFee(positionID int) (int, error) {
+	var fee int
+	err := db.Model(&model.ParkFee{}).Select("FeePerHour").Where("position_id = ?", positionID).First(&fee).Error
+	return fee, err
+}

@@ -18,5 +18,7 @@ type ChargeFee struct {
 
 type ParkFee struct {
 	BaseModel
-	FeePerHour int `gorm:"column:fee_per_hour;type:int(11);not null;default 0 comment '费用/小时'" json:"fee_per_hour"`
+	PositionID int      `gorm:"column:position_id;type:int(11);not null;default 0 comment '位置id'" json:"position_id"`
+	Position   Position `gorm:"foreignKey:PositionID;references:ID" json:"position"`
+	FeePerHour int      `gorm:"column:fee_per_hour;type:int(11);not null;default 0 comment '费用/小时'" json:"fee_per_hour"`
 }

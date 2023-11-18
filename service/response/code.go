@@ -26,6 +26,8 @@ const (
 	WRONG_QRCODE_EXIT_ERROR                       // 错误的二维码出口错误
 	WRONG_QRCODE_CHARGE_START_ERROR               // 错误的开始充电二维码
 	WRONG_QRCODE_CHARGE_END_ERROR                 // 错误的结束充电二维码
+	WRONG_QRCODE_PARK_START_ERROR                 // 错误的开始停车的二维码
+	WRONG_QRCODE_PARK_END_ERROR                   // 错误的开始停车的二维码
 	GET_POSITION_ERROR                            // 获取position错误
 	GET_FEE_ERROR                                 // 获取fee错误
 	PREVIOUS_ORDER_FIRST_ERROR                    // 应该支付上一个订单
@@ -55,6 +57,10 @@ func MsgForCode(code int) string {
 		return "当前二维码不是开始充电的二维码"
 	case WRONG_QRCODE_CHARGE_END_ERROR:
 		return "当前二维码不是结束充电的二维码"
+	case WRONG_QRCODE_PARK_START_ERROR:
+		return "当前二维码不是开始停车的二维码"
+	case WRONG_QRCODE_PARK_END_ERROR:
+		return "当前二维码不是结束停车的二维码"
 	case GET_POSITION_ERROR:
 		return "获取当前位置信息错误"
 	case GET_FEE_ERROR:
