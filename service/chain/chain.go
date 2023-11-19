@@ -1,6 +1,8 @@
 package chain
 
 import (
+	"carservice/contracts/order"
+	"carservice/contracts/user"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -8,14 +10,18 @@ import (
 	"path"
 	"strings"
 
-	"chainmaker.org/chainmaker/common/v2/evmutils"
-	"chainmaker.org/chainmaker/common/v2/evmutils/abi"
 	"chainmaker.org/chainmaker/pb-go/v2/common"
 	sdk "chainmaker.org/chainmaker/sdk-go/v2"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	cm "github.com/ethereum/go-ethereum/common"
 )
 
 type ChainClient struct {
-	client *sdk.ChainClient
+	client        *sdk.ChainClient
+	userContract  *common.Contract
+	userABI       *abi.ABI
+	orderContract *common.Contract
+	orderABI      *abi.ABI
 }
 
 type Option = func(*ChainClient)
@@ -55,94 +61,163 @@ func createClientWithConfig() (*sdk.ChainClient, error) {
 	return chainClient, nil
 }
 
-func (cc *ChainClient) TokenContractBalanceOf(address string) error {
-	// kvs := common.
-	contractName := "token"
+func (cc *ChainClient) InitContracts() {
+	var (
+		userContractName     = "user1"
+		orderContractName    = "order1"
+		userContractVersion  = "1.0.0"
+		orderContractVersion = "1.0.0"
+		userContractAddress  = ""
+		orderContractAddress = ""
+	)
 
-	version := "1.0.0"
-
-	contract, err := cc.client.GetContractInfo(contractName)
-	if err != nil {
-		if strings.Contains(err.Error(), "contract not exist") || contract == nil || contract.Name == "" {
-			fmt.Printf("合约[%s]不存在\n", contractName)
-			fmt.Println("====================== 创建合约 ======================")
-			byteCode, err := os.ReadFile("./contracts/token/token.bin")
-			if err != nil {
-				log.Fatalln(err)
-			}
-			createPayload, err := cc.client.CreateContractCreatePayload(contractName, version, string(byteCode), common.RuntimeType_EVM, []*common.KeyValuePair{})
-			if err != nil {
-				log.Fatalln(err)
-			}
-
-			usernames := []string{UserNameOrg1Admin1, UserNameOrg2Admin1, UserNameOrg3Admin1, UserNameOrg4Admin1}
-
-			endorsers, err := GetEndorsersWithAuthType(cc.client.GetHashType(),
-				cc.client.GetAuthType(), createPayload, usernames...)
-			if err != nil {
-				log.Fatalln(err)
-			}
-
-			resp, err := cc.client.SendContractManageRequest(createPayload, endorsers, 30000, true)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			log.Printf("%+v\n", resp)
-			// fmt.Printf("blockHeight:%d, txId:%s, result:%s, msg:%s\n\n", resp.TxBlockHeight, resp.TxId, resp.ContractResult.Result, resp.ContractResult.Message)
-		} else {
-			if err != nil {
-				log.Fatalln(err)
-			}
-		}
-	} else {
-		fmt.Printf("合约已存在 %+v \n\n", contract)
-	}
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	abiJson, err := os.ReadFile(path.Join(dir, "contracts/token/token.abi"))
+
+	userContract, err := cc.client.GetContractInfo(userContractName)
+	if err != nil {
+		if strings.Contains(err.Error(), "contract not exist") || userContract == nil || userContract.Name == "" {
+			log.Printf("合约[%s]不存在\n", userContractName)
+			log.Println("====================== 创建合约 ======================")
+		}
+		// read bytecode
+		byteCode, err := os.ReadFile(path.Join(dir, "contracts/user/User.bin"))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		createPayload, err := cc.client.CreateContractCreatePayload(userContractName, userContractVersion, string(byteCode), common.RuntimeType_EVM, []*common.KeyValuePair{})
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		usernames := []string{UserNameOrg1Admin1, UserNameOrg2Admin1, UserNameOrg3Admin1, UserNameOrg4Admin1}
+
+		endorsers, err := GetEndorsersWithAuthType(cc.client.GetHashType(),
+			cc.client.GetAuthType(), createPayload, usernames...)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		resp, err := cc.client.SendContractManageRequest(createPayload, endorsers, 30000, true)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		log.Printf("%+v\n", resp)
+
+		userContract, err := cc.client.GetContractInfo(userContractName)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		userContractAddress = userContract.Address
+		cc.userContract = userContract
+	} else {
+		userContractAddress = userContract.Address
+		cc.userContract = userContract
+	}
+
+	log.Printf("user contract address is %s\n", userContractAddress)
+
+	orderContract, err := cc.client.GetContractInfo(orderContractName)
+	if err != nil {
+		if strings.Contains(err.Error(), "contract not exist") || orderContract == nil || orderContract.Name == "" {
+			log.Printf("合约[%s]不存在\n", orderContractName)
+			log.Println("====================== 创建合约 ======================")
+		}
+		// read bytecode
+		byteCode, err := os.ReadFile(path.Join(dir, "contracts/order/Order.bin"))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if err != nil {
+			log.Fatalln(err)
+		}
+		createPayload, err := cc.client.CreateContractCreatePayload(orderContractName, orderContractVersion, string(byteCode), common.RuntimeType_EVM, []*common.KeyValuePair{})
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		usernames := []string{UserNameOrg1Admin1, UserNameOrg2Admin1, UserNameOrg3Admin1, UserNameOrg4Admin1}
+
+		endorsers, err := GetEndorsersWithAuthType(cc.client.GetHashType(),
+			cc.client.GetAuthType(), createPayload, usernames...)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		resp, err := cc.client.SendContractManageRequest(createPayload, endorsers, 30000, true)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		log.Printf("%+v\n", resp)
+
+		orderContract, err := cc.client.GetContractInfo(orderContractName)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		cc.orderContract = orderContract
+		orderContractAddress = orderContract.Address
+	} else {
+		cc.orderContract = orderContract
+		orderContractAddress = orderContract.Address
+	}
+
+	log.Printf("order contract address is %s\n", orderContractAddress)
+
+	// init abi
+	// 使用 go-ethereum的abi包
+	userABI, err := user.UserMetaData.GetAbi()
 	if err != nil {
 		log.Fatalln(err)
 	}
+	cc.userABI = userABI
 
-	myAbi, err := abi.JSON(strings.NewReader(string(abiJson)))
+	orderABI, err := order.OrderMetaData.GetAbi()
 	if err != nil {
 		log.Fatalln(err)
 	}
+	cc.orderABI = orderABI
 
-	//addr := evmutils.StringToAddress(address)
-	addr := evmutils.BigToAddress(evmutils.FromDecimalString(address))
-
-	methodName := "balanceOf"
-	dataByte, err := myAbi.Pack(methodName, addr)
+	// order initialize
+	methodName := "Initialize"
+	dataByte, err := orderABI.Pack(methodName, cm.HexToAddress(userContractAddress))
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("initialize err: %+v\n", err)
 	}
-
 	dataString := hex.EncodeToString(dataByte)
-
 	kvs := []*common.KeyValuePair{
 		{
 			Key:   "data",
 			Value: []byte(dataString),
 		},
 	}
-
-	result, err := invokeTokenContractWithResult(cc.client, contractName, methodName, "", kvs, true)
+	result, err := invokeContractWithResult(cc.client, orderContractName, methodName, "", kvs, true)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	balance, err := myAbi.Unpack(methodName, result)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Printf("addr [%s] => %+v\n", address, balance)
-	return nil
+	log.Printf("result: %+v\n", result)
+
+	// TODO: grant manager for order
+
+	// FIXME: test create user
+
+	// err = cc.CreateUser(1, 18539265600, 100000)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	// FIXME: test get user
+	// userInfo, err := cc.GetUserInfo(1)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// log.Printf("user info: %+v\n", userInfo)
+
 }
 
-func invokeTokenContractWithResult(client *sdk.ChainClient, contractName, method, txId string,
+func invokeContractWithResult(client *sdk.ChainClient, contractName, method, txId string,
 	kvs []*common.KeyValuePair, withSyncResult bool) ([]byte, error) {
 
 	resp, err := client.InvokeContract(contractName, method, txId, kvs, -1, withSyncResult)

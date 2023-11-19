@@ -1,4 +1,22 @@
-服务器部署：
+搭建长安链环境
+感觉提示来搭建即可，如果是服务器环境，要注意暴露对应的端口。
+https://docs.chainmaker.org.cn/v2.3.2/html/quickstart/%E9%80%9A%E8%BF%87%E7%AE%A1%E7%90%86%E5%8F%B0%E4%BD%93%E9%AA%8C%E9%93%BE.html
+
+```
+git clone -b v2.3.2 --depth=1 https://git.chainmaker.org.cn/chainmaker/management-backend.git
+cd management-backend
+docker compose up -d
+```
+访问对应ip的80端口即可
+
+区块链管理->配置链之后，
+下载连文件并部署，如果是服务器环境，就上传到服务器上。
+![部署链](images/chain.png)
+```bash
+scp ~/Downloads/test.zip  MyTencent:/root/test.zip
+```
+
+
 
 ```bash
 docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp golang:1.20 bash -c 'go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && go build -v'

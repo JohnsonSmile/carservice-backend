@@ -1,5 +1,5 @@
 chain_client:
-  chain_id: local
+  chain_id: test
   org_id: TestCMorg1
   user_key_file_path: ./crypto-config/TestCMorg1/user/cmtestuser1/cmtestuser1.tls.key
   user_crt_file_path: ./crypto-config/TestCMorg1/user/cmtestuser1/cmtestuser1.tls.crt
@@ -8,7 +8,7 @@ chain_client:
   retry_limit: 10
   retry_interval: 500
   nodes:
-  - node_addr: 192.168.31.164:12301
+  - node_addr: 134.175.83.213:12301
     conn_cnt: 10
     enable_tls: true
     trust_root_paths:
