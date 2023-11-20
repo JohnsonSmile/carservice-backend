@@ -28,6 +28,10 @@ type ChargeEndRequest struct {
 	ID int `json:"id" binding:"required"`
 }
 
+type PayOrderRequest struct {
+	ID int `json:"id" binding:"required"`
+}
+
 type HighwayOrdersRequest struct {
 	Page int `form:"page" binding:"required"`
 	Size int `form:"size" binding:"required"`

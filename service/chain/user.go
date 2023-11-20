@@ -76,7 +76,7 @@ func (cc *ChainClient) GrantManager(address string) error {
 
 	// dataByte, err := cc.userABI.Pack(managerRoleMethodName)
 	// if err != nil {
-	// 	log.Fatalln(err)
+	// 	return err
 	// }
 
 	// dataString := hex.EncodeToString(dataByte)
@@ -90,12 +90,12 @@ func (cc *ChainClient) GrantManager(address string) error {
 
 	// result, err := invokeContractWithResult(cc.client, cc.userContract.Name, managerRoleMethodName, "", kvs, true)
 	// if err != nil {
-	// 	log.Fatalln(err)
+	//	return err
 	// }
 
 	// roleNames, err := cc.userABI.Unpack(managerRoleMethodName, result)
 	// if err != nil {
-	// 	log.Fatalln(err)
+	//	return err
 	// }
 
 	// log.Printf("role name: %+v\n", roleNames)
@@ -104,14 +104,14 @@ func (cc *ChainClient) GrantManager(address string) error {
 	// }
 	// managerRoleBytes, err := json.Marshal(roleNames[0])
 	// if err != nil {
-	// 	log.Fatalln(err)
+	//	return err
 	// }
 	// log.Printf("managerRoleBytes: %+v\n", string(managerRoleBytes))
 	managerRoleBytes := []byte("[175,41,13,134,128,130,10,173,146,40,85,243,155,48,96,151,178,14,40,119,77,108,26,211,90,32,50,86,48,195,160,44]")
 	var roleBytes32 [32]byte
 	err := json.Unmarshal(managerRoleBytes, &roleBytes32)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	// grant role
@@ -119,7 +119,7 @@ func (cc *ChainClient) GrantManager(address string) error {
 
 	grantDataByte, err := cc.userABI.Pack(grantMethodName, roleBytes32, cm.HexToAddress(address))
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	grantDataString := hex.EncodeToString(grantDataByte)
@@ -133,12 +133,12 @@ func (cc *ChainClient) GrantManager(address string) error {
 
 	grantResult, err := invokeContractWithResult(cc.client, cc.userContract.Name, grantMethodName, "", grantKvs, true)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	granted, err := cc.userABI.Unpack(grantMethodName, grantResult)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	log.Printf("grant result: %+v\n", granted)
@@ -149,9 +149,9 @@ func (cc *ChainClient) GrantManager(address string) error {
 func (cc *ChainClient) CreateUser(userId int, phone int, score int) error {
 
 	methodName := "CreateUser"
-	dataByte, err := cc.userABI.Pack(methodName, userId, phone, score)
+	dataByte, err := cc.userABI.Pack(methodName, big.NewInt(int64(userId)), big.NewInt(int64(phone)), big.NewInt(int64(score)))
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	dataString := hex.EncodeToString(dataByte)
@@ -165,7 +165,7 @@ func (cc *ChainClient) CreateUser(userId int, phone int, score int) error {
 
 	result, err := invokeContractWithResult(cc.client, cc.userContract.Name, methodName, "", kvs, true)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	log.Printf("result: %+v\n", result)
@@ -178,7 +178,7 @@ func (cc *ChainClient) GetUserInfo(userId int) (*UserInfo, error) {
 
 	dataByte, err := cc.userABI.Pack(methodName, big.NewInt(int64(userId)))
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	dataString := hex.EncodeToString(dataByte)
@@ -192,12 +192,12 @@ func (cc *ChainClient) GetUserInfo(userId int) (*UserInfo, error) {
 
 	result, err := invokeContractWithResult(cc.client, cc.userContract.Name, methodName, "", kvs, true)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	userInfos, err := cc.userABI.Unpack(methodName, result)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 	if len(userInfos) > 0 {
 		dataBytes, err := json.Marshal(userInfos[0])
@@ -211,7 +211,7 @@ func (cc *ChainClient) GetUserInfo(userId int) (*UserInfo, error) {
 		}
 		return &userInfo, nil
 	}
-	return nil, nil
+	return nil, errors.New("get user info error")
 }
 
 func (cc *ChainClient) ChargeScore(userId int, score int) error {

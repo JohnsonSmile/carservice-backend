@@ -157,3 +157,30 @@ func EndParkOrder(order *model.Order) error {
 	}
 	return nil
 }
+
+func GetOrderByID(id int) (*model.Order, error) {
+	var order model.Order
+	err := db.Model(&model.Order{}).Preload("StartPosition").Preload("EndPosition").Where("id = ?", id).First(&order).Error
+	if err != nil {
+		return nil, err
+	}
+	return &order, nil
+}
+
+func GetOrders(page, size int) (orders []*model.Order, total int64, err error) {
+	orders = make([]*model.Order, 0)
+	if err := db.Scopes(model.Paginate(page, size)).Model(&model.Order{}).Preload("StartPosition").Preload("EndPosition").Order("start_at desc").Find(&orders).Error; err != nil {
+		return nil, 0, err
+	}
+	if err := db.Model(&model.Order{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	return orders, total, nil
+}
+
+func UpdateOrderPayed(id int) error {
+	if rowsAffected := db.Model(&model.Order{}).Where("id = ?", id).Update("order_status", 2).RowsAffected; rowsAffected == 0 {
+		return errors.New("update failed")
+	}
+	return nil
+}

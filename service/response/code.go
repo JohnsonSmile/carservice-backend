@@ -34,8 +34,12 @@ const (
 	READY_TO_PAY_ERROR                            // 已经准备支付了ready to pay
 	CREATE_ORDER_FAILED                           // 创建订单失败
 
-	GET_USER_ERROR     // 获取用户信息错误
-	CHARGE_SCORE_ERROR // 充值score错误
+	GET_USER_ERROR            // 获取用户信息错误
+	CHARGE_SCORE_ERROR        // 充值score错误
+	CREATE_CHAIN_ORDER_FAILED // 创建order失败
+	INSUFFICIENT_BALANCE      // 余额不足
+	PAY_ORDER_FAILED          // 支付订单失败
+	UPDATE_ORDER_PAYED_FAILED // 更新订单支付状态失败
 )
 
 func MsgForCode(code int) string {
@@ -76,6 +80,14 @@ func MsgForCode(code int) string {
 		return "获取用户信息错误"
 	case CHARGE_SCORE_ERROR:
 		return "充值score错误"
+	case CREATE_CHAIN_ORDER_FAILED:
+		return "创建order失败"
+	case INSUFFICIENT_BALANCE:
+		return "余额不足,请在个人中心充值"
+	case PAY_ORDER_FAILED:
+		return "支付订单失败"
+	case UPDATE_ORDER_PAYED_FAILED:
+		return "更新订单支付状态失败"
 	default:
 		return "未知错误"
 	}

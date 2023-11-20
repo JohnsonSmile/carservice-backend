@@ -63,8 +63,8 @@ func createClientWithConfig() (*sdk.ChainClient, error) {
 
 func (cc *ChainClient) InitContracts() {
 	var (
-		userContractName     = "user1"
-		orderContractName    = "order1"
+		userContractName     = "caruser"
+		orderContractName    = "carorder"
 		userContractVersion  = "1.0.0"
 		orderContractVersion = "1.0.0"
 		userContractAddress  = ""
@@ -233,6 +233,32 @@ func (cc *ChainClient) InitContracts() {
 
 	// FIXME: test pay score
 	// err = cc.PayScore(1, 1000)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	// FIXME: test create order
+	// err = cc.CreateOrder(
+	// 	1,
+	// 	"TESTSZ1000230011",
+	// 	0,
+	// 	1700377074,
+	// 	1700378074, 1, 1000, 1, false,
+	// 	"火星1号高速A",
+	// 	"兰桂坊高速B")
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	// FIXME: test get order
+	// orderInfo, err := cc.GetOrder(1)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// log.Printf("orderInfo: %+v\n", orderInfo)
+
+	// FIXME: test pay for order
+	// err = cc.PayOrder(1, 1)
 	// if err != nil {
 	// 	log.Fatalln(err)
 	// }

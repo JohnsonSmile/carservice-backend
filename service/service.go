@@ -44,7 +44,7 @@ func (s *Service) Run() {
 		// set user info
 		apiGroup.POST("/user/info", middleware.JWTAuth(), s.UpdateUserInfo)
 		// charge score
-		apiGroup.POST("/user/charge", middleware.Cors(), s.ChargeScore)
+		apiGroup.POST("/user/charge", middleware.JWTAuth(), s.ChargeScore)
 
 		// high way
 		apiGroup.POST("/highway/preview", middleware.JWTAuth(), s.PreviewHighWay)
@@ -66,6 +66,7 @@ func (s *Service) Run() {
 		apiGroup.GET("/highway/orders", middleware.JWTAuth(), s.GetHighWayOrders)
 		apiGroup.GET("/charge/orders", middleware.JWTAuth(), s.GetChargeOrders)
 		apiGroup.GET("/park/orders", middleware.JWTAuth(), s.GetParkOrders)
+		apiGroup.GET("/order/list", middleware.JWTAuth(), s.GetOrderList)
 
 	}
 	go func() {

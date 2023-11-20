@@ -98,6 +98,7 @@ func (s *Service) PreviewHighWay(c *gin.Context) {
 			Code: response.SUCCESS,
 			Msg:  response.MsgForCode(response.SUCCESS),
 			Data: gin.H{
+				"id":            0,
 				"start_positon": position.Name,
 				"start_id":      position.ID,
 				"end_positon":   "",
@@ -156,6 +157,7 @@ func (s *Service) PreviewHighWay(c *gin.Context) {
 			Code: response.SUCCESS,
 			Msg:  response.MsgForCode(response.SUCCESS),
 			Data: gin.H{
+				"id":            order.ID,
 				"start_positon": order.StartPosition.Name,
 				"start_id":      order.StartPosition.ID,
 				"end_positon":   position.Name,
@@ -178,6 +180,7 @@ func (s *Service) PreviewHighWay(c *gin.Context) {
 				Code: response.PREVIOUS_ORDER_FIRST_ERROR,
 				Msg:  response.MsgForCode(response.PREVIOUS_ORDER_FIRST_ERROR),
 				Data: gin.H{
+					"id":            order.ID,
 					"start_positon": order.StartPosition.Name,
 					"start_id":      order.StartPosition.ID,
 					"end_positon":   order.EndPosition.Name,
@@ -198,6 +201,7 @@ func (s *Service) PreviewHighWay(c *gin.Context) {
 				Code: response.SUCCESS,
 				Msg:  response.MsgForCode(response.SUCCESS),
 				Data: gin.H{
+					"id":            order.ID,
 					"start_positon": order.StartPosition.Name,
 					"start_id":      order.StartPosition.ID,
 					"end_positon":   order.EndPosition.Name,
@@ -252,6 +256,7 @@ func (s *Service) StartHighWay(c *gin.Context) {
 			Code: response.PREVIOUS_ORDER_FIRST_ERROR,
 			Msg:  response.MsgForCode(response.PREVIOUS_ORDER_FIRST_ERROR),
 			Data: gin.H{
+				"id":            order.ID,
 				"start_positon": order.StartPosition.Name,
 				"start_id":      order.StartPosition.ID,
 				"end_positon":   order.EndPosition.Name,
@@ -306,6 +311,7 @@ func (s *Service) StartHighWay(c *gin.Context) {
 		Code: response.SUCCESS,
 		Msg:  response.MsgForCode(response.SUCCESS),
 		Data: gin.H{
+			"id":            newOrder.ID,
 			"start_positon": position.Name,
 			"start_id":      position.ID,
 			"end_positon":   "",
@@ -357,6 +363,7 @@ func (s *Service) EndHighWay(c *gin.Context) {
 			Code: http.StatusOK,
 			Msg:  "success",
 			Data: gin.H{
+				"id":            order.ID,
 				"start_positon": order.StartPosition.Name,
 				"start_id":      order.StartPosition.ID,
 				"end_positon":   order.EndPosition.Name,
@@ -399,6 +406,21 @@ func (s *Service) EndHighWay(c *gin.Context) {
 	order.Fee = fee
 	now := time.Now()
 	order.EndAt = &now
+
+	// end的时候再把order信息上链，在pay的时候来更新isPayed状态
+	err = s.chainClient.CreateOrder(order.ID, order.OrderSn, uint8(order.OrderTypeID-1), int(order.StartAt.Unix()), int(order.EndAt.Unix()), order.UserID, order.Fee, 100, order.OrderStatus == 2, order.StartPosition.Name, order.EndPosition.Name)
+	if err != nil {
+		logger.Error("create order error", err)
+		// TODO: 邮件通知即可
+		c.JSON(http.StatusOK, &response.Response{
+			Code: response.CREATE_CHAIN_ORDER_FAILED,
+			Msg:  response.MsgForCode(response.CREATE_CHAIN_ORDER_FAILED),
+		})
+		return
+
+	}
+
+	// 同步到数据库
 	err = database.EndOrder(order)
 	if err != nil {
 		c.JSON(http.StatusOK, &response.Response{
@@ -412,6 +434,7 @@ func (s *Service) EndHighWay(c *gin.Context) {
 		Code: http.StatusOK,
 		Msg:  "success",
 		Data: gin.H{
+			"id":            order.ID,
 			"start_positon": order.StartPosition.Name,
 			"start_id":      order.StartPosition.ID,
 			"end_positon":   position.Name,
@@ -839,6 +862,21 @@ func (s *Service) EndCharge(c *gin.Context) {
 	now := time.Now()
 	order.EndAt = &now
 	order.UniteCount = 1050 // TODO: 假数据，就默认消耗了10.5度
+
+	// end的时候再把order信息上链，在pay的时候来更新isPayed状态
+	err = s.chainClient.CreateOrder(order.ID, order.OrderSn, uint8(order.OrderTypeID-1), int(order.StartAt.Unix()), int(order.EndAt.Unix()), order.UserID, order.Fee, order.UniteCount, order.OrderStatus == 2, order.StartPosition.Name, order.EndPosition.Name)
+	if err != nil {
+		logger.Error("create order error", err)
+		// TODO: 邮件通知即可
+		c.JSON(http.StatusOK, &response.Response{
+			Code: response.CREATE_CHAIN_ORDER_FAILED,
+			Msg:  response.MsgForCode(response.CREATE_CHAIN_ORDER_FAILED),
+		})
+		return
+
+	}
+
+	// 写入到数据库
 	err = database.EndChargeOrder(order)
 	if err != nil {
 		c.JSON(http.StatusOK, &response.Response{
@@ -1280,6 +1318,21 @@ func (s *Service) EndPark(c *gin.Context) {
 	now := time.Now()
 	order.EndAt = &now
 	order.UniteCount = 1050 // TODO: 假数据，就默认消耗了10.5度
+
+	// end的时候再把order信息上链，在pay的时候来更新isPayed状态
+	err = s.chainClient.CreateOrder(order.ID, order.OrderSn, uint8(order.OrderTypeID-1), int(order.StartAt.Unix()), int(order.EndAt.Unix()), order.UserID, order.Fee, order.UniteCount, order.OrderStatus == 2, order.StartPosition.Name, order.EndPosition.Name)
+	if err != nil {
+		logger.Error("create order error", err)
+		// TODO: 邮件通知即可
+		c.JSON(http.StatusOK, &response.Response{
+			Code: response.CREATE_CHAIN_ORDER_FAILED,
+			Msg:  response.MsgForCode(response.CREATE_CHAIN_ORDER_FAILED),
+		})
+		return
+
+	}
+
+	// 更新数据库
 	err = database.EndParkOrder(order)
 	if err != nil {
 		c.JSON(http.StatusOK, &response.Response{
@@ -1346,6 +1399,133 @@ func (s *Service) GetParkOrders(c *gin.Context) {
 	})
 }
 
+func (s *Service) GetOrderList(c *gin.Context) {
+	req := request.HighwayOrdersRequest{}
+	if err := c.ShouldBindQuery(&req); err != nil {
+		logger.Error("param error", err)
+		HandleValidatorError(c, err)
+		return
+	}
+
+	// user id
+	// 从context中获取用户id
+	userId := c.GetUint("userId")
+	if userId == 0 {
+		c.JSON(http.StatusBadRequest, &response.Response{
+			Code: http.StatusBadRequest,
+			Msg:  "params error",
+		})
+		return
+	}
+
+	orders, total, err := database.GetOrders(req.Page, req.Size)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &response.Response{
+			Code: http.StatusInternalServerError,
+			Msg:  "get park orders failed",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, &response.Response{
+		Code: http.StatusOK,
+		Msg:  "success",
+		Data: gin.H{
+			"orders": orders,
+			"total":  total,
+		},
+	})
+
+}
+
 func (s *Service) PayOrder(c *gin.Context) {
 
+	req := request.PayOrderRequest{}
+	if err := c.ShouldBind(&req); err != nil {
+		logger.Error("param error", err)
+		HandleValidatorError(c, err)
+		return
+	}
+
+	// user id
+	// 从context中获取用户id
+	userId := c.GetUint("userId")
+	if userId == 0 {
+		c.JSON(http.StatusBadRequest, &response.Response{
+			Code: http.StatusBadRequest,
+			Msg:  "params error",
+		})
+		return
+	}
+
+	// 根据order id 获取order
+	order, err := database.GetOrderByID(req.ID)
+	if err != nil {
+		logger.Error("get order error", err)
+		c.JSON(http.StatusBadRequest, &response.Response{
+			Code: http.StatusBadRequest,
+			Msg:  "get order error",
+		})
+		return
+	}
+
+	if order.OrderStatus == 0 {
+		// 说明已经支付过了，提示前端支付
+		c.JSON(http.StatusOK, &response.Response{
+			Code: response.SUCCESS,
+			Msg:  response.MsgForCode(response.SUCCESS),
+		})
+		return
+	}
+
+	// 获取一下用户的余额
+	userInfo, err := s.chainClient.GetUserInfo(int(userId))
+	if err != nil {
+		logger.Error("get user info failed", err)
+		c.JSON(http.StatusOK, &response.Response{
+			Code: response.GET_USER_ERROR,
+			Msg:  response.MsgForCode(response.GET_USER_ERROR),
+		})
+		return
+	}
+	score := userInfo.Score.Int64()
+
+	price := order.Fee * order.UniteCount / 100
+	if order.OrderTypeID == 1 { // 1 highway
+		price = order.Fee
+	}
+	if score < int64(price) {
+		c.JSON(http.StatusOK, &response.Response{
+			Code: response.INSUFFICIENT_BALANCE,
+			Msg:  response.MsgForCode(response.INSUFFICIENT_BALANCE),
+		})
+		return
+	}
+
+	// 使用 链端来支付
+	err = s.chainClient.PayOrder(order.ID, int(userId))
+	if err != nil {
+
+		logger.Error("pay order failed", err)
+		c.JSON(http.StatusOK, &response.Response{
+			Code: response.PAY_ORDER_FAILED,
+			Msg:  response.MsgForCode(response.PAY_ORDER_FAILED),
+		})
+		return
+	}
+
+	// 同步到数据库
+	err = database.UpdateOrderPayed(order.ID)
+	if err != nil {
+		logger.Error("update order payed failed", err)
+		c.JSON(http.StatusOK, &response.Response{
+			Code: response.UPDATE_ORDER_PAYED_FAILED,
+			Msg:  response.MsgForCode(response.UPDATE_ORDER_PAYED_FAILED),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, &response.Response{
+		Code: response.SUCCESS,
+		Msg:  response.MsgForCode(response.SUCCESS),
+	})
 }
