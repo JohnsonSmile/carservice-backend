@@ -6,7 +6,7 @@ mysql:
   port: 3306
   database: "carservice"
 jwt:
-  key: "protocolFeeDestination"
+  key: "Y2Fyc2VydmljZQ=="
 rsa:
   private_key: |-
     -----BEGIN RSA PRIVATE KEY-----
