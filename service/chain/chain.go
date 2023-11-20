@@ -180,8 +180,8 @@ func (cc *ChainClient) InitContracts() {
 	cc.orderABI = orderABI
 
 	// order initialize
-	methodName := "Initialize"
-	dataByte, err := orderABI.Pack(methodName, cm.HexToAddress(userContractAddress))
+	initializeMethodName := "Initialize"
+	dataByte, err := orderABI.Pack(initializeMethodName, cm.HexToAddress(userContractAddress))
 	if err != nil {
 		log.Fatalf("initialize err: %+v\n", err)
 	}
@@ -192,14 +192,24 @@ func (cc *ChainClient) InitContracts() {
 			Value: []byte(dataString),
 		},
 	}
-	result, err := invokeContractWithResult(cc.client, orderContractName, methodName, "", kvs, true)
+	result, err := invokeContractWithResult(cc.client, orderContractName, initializeMethodName, "", kvs, true)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	log.Printf("result: %+v\n", result)
 
-	// TODO: grant manager for order
+	// grant manager for order
+	isManager, err := cc.IsManager(orderContractAddress)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if !isManager {
+		err = cc.GrantManager(orderContractAddress)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
 
 	// FIXME: test create user
 
@@ -215,6 +225,22 @@ func (cc *ChainClient) InitContracts() {
 	// }
 	// log.Printf("user info: %+v\n", userInfo)
 
+	// FIXME: test charge score
+	// err = cc.ChargeScore(1, 1000)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	// FIXME: test pay score
+	// err = cc.PayScore(1, 1000)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+}
+
+func (cc *ChainClient) Shutdown() {
+	cc.client.Stop()
 }
 
 func invokeContractWithResult(client *sdk.ChainClient, contractName, method, txId string,

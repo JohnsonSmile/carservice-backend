@@ -32,3 +32,7 @@ type HighwayOrdersRequest struct {
 	Page int `form:"page" binding:"required"`
 	Size int `form:"size" binding:"required"`
 }
+
+type ChargeScoreRequest struct {
+	Score int `json:"score" binding:"required"`
+}

@@ -1,4 +1,4 @@
-package handler
+package service
 
 import (
 	"carservice/infra/database"
@@ -17,7 +17,7 @@ import (
 )
 
 // 不需要考虑并发问题
-func PreviewHighWay(c *gin.Context) {
+func (s *Service) PreviewHighWay(c *gin.Context) {
 	req := request.PreviewRequest{}
 	if err := c.ShouldBind(&req); err != nil {
 		logger.Error("param error", err)
@@ -217,7 +217,7 @@ func PreviewHighWay(c *gin.Context) {
 
 }
 
-func StartHighWay(c *gin.Context) {
+func (s *Service) StartHighWay(c *gin.Context) {
 	req := request.StartRequest{}
 	if err := c.ShouldBind(&req); err != nil {
 		logger.Error("param error", err)
@@ -321,7 +321,7 @@ func StartHighWay(c *gin.Context) {
 
 }
 
-func EndHighWay(c *gin.Context) {
+func (s *Service) EndHighWay(c *gin.Context) {
 	req := request.EndRequest{}
 	if err := c.ShouldBind(&req); err != nil {
 		logger.Error("param error", err)
@@ -427,7 +427,7 @@ func EndHighWay(c *gin.Context) {
 	})
 }
 
-func GetHighWayOrders(c *gin.Context) {
+func (s *Service) GetHighWayOrders(c *gin.Context) {
 	req := request.HighwayOrdersRequest{}
 	if err := c.ShouldBindQuery(&req); err != nil {
 		logger.Error("param error", err)
@@ -466,7 +466,7 @@ func GetHighWayOrders(c *gin.Context) {
 
 // charge
 
-func PreviewCharge(c *gin.Context) {
+func (s *Service) PreviewCharge(c *gin.Context) {
 
 	req := request.PreviewRequest{}
 	if err := c.ShouldBind(&req); err != nil {
@@ -661,7 +661,7 @@ func PreviewCharge(c *gin.Context) {
 
 }
 
-func StartCharge(c *gin.Context) {
+func (s *Service) StartCharge(c *gin.Context) {
 	req := request.StartRequest{}
 	if err := c.ShouldBind(&req); err != nil {
 		logger.Error("param error", err)
@@ -781,7 +781,7 @@ func StartCharge(c *gin.Context) {
 
 }
 
-func EndCharge(c *gin.Context) {
+func (s *Service) EndCharge(c *gin.Context) {
 
 	req := request.ChargeEndRequest{}
 	if err := c.ShouldBind(&req); err != nil {
@@ -869,7 +869,7 @@ func EndCharge(c *gin.Context) {
 
 }
 
-func GetChargeOrders(c *gin.Context) {
+func (s *Service) GetChargeOrders(c *gin.Context) {
 	req := request.HighwayOrdersRequest{}
 	if err := c.ShouldBindQuery(&req); err != nil {
 		logger.Error("param error", err)
@@ -908,7 +908,7 @@ func GetChargeOrders(c *gin.Context) {
 
 // park
 
-func PreviewPark(c *gin.Context) {
+func (s *Service) PreviewPark(c *gin.Context) {
 
 	req := request.PreviewRequest{}
 	if err := c.ShouldBind(&req); err != nil {
@@ -1102,7 +1102,7 @@ func PreviewPark(c *gin.Context) {
 	}
 }
 
-func StartPark(c *gin.Context) {
+func (s *Service) StartPark(c *gin.Context) {
 	req := request.StartRequest{}
 	if err := c.ShouldBind(&req); err != nil {
 		logger.Error("param error", err)
@@ -1222,7 +1222,7 @@ func StartPark(c *gin.Context) {
 
 }
 
-func EndPark(c *gin.Context) {
+func (s *Service) EndPark(c *gin.Context) {
 
 	req := request.ChargeEndRequest{}
 	if err := c.ShouldBind(&req); err != nil {
@@ -1309,7 +1309,7 @@ func EndPark(c *gin.Context) {
 	})
 }
 
-func GetParkOrders(c *gin.Context) {
+func (s *Service) GetParkOrders(c *gin.Context) {
 	req := request.HighwayOrdersRequest{}
 	if err := c.ShouldBindQuery(&req); err != nil {
 		logger.Error("param error", err)
@@ -1346,6 +1346,6 @@ func GetParkOrders(c *gin.Context) {
 	})
 }
 
-func PayOrder(c *gin.Context) {
+func (s *Service) PayOrder(c *gin.Context) {
 
 }

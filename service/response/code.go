@@ -33,6 +33,9 @@ const (
 	PREVIOUS_ORDER_FIRST_ERROR                    // 应该支付上一个订单
 	READY_TO_PAY_ERROR                            // 已经准备支付了ready to pay
 	CREATE_ORDER_FAILED                           // 创建订单失败
+
+	GET_USER_ERROR     // 获取用户信息错误
+	CHARGE_SCORE_ERROR // 充值score错误
 )
 
 func MsgForCode(code int) string {
@@ -69,9 +72,12 @@ func MsgForCode(code int) string {
 		return "您还有未支付的订单，请先支付"
 	case READY_TO_PAY_ERROR:
 		return "已经结束订单，请支付"
+	case GET_USER_ERROR:
+		return "获取用户信息错误"
+	case CHARGE_SCORE_ERROR:
+		return "充值score错误"
 	default:
 		return "未知错误"
-
 	}
 
 }

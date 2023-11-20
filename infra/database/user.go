@@ -26,3 +26,11 @@ func GetUserByPhone(phone string) (*model.User, error) {
 	}
 	return user, nil
 }
+
+func GetUserById(id uint) (*model.User, error) {
+	user := &model.User{}
+	if err := db.Where("id = ?", id).First(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}
