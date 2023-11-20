@@ -53,6 +53,8 @@ addr [470532945834136871529055253531705118185281158937] => [%!d(string=0)]
 
 // 初始化数据库数据
 
+这里可以直接用`carserie.sql`来初始化数据
+
 ```
 go test -v infra/database/database_test.go -run TestPrePareHighwayData
 go test -v infra/database/database_test.go -run TestPrePareChargeData
