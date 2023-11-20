@@ -19,9 +19,30 @@ scp ~/Downloads/test.zip  MyTencent:/root/test.zip
 
 
 ```bash
-docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp golang:1.20 bash -c 'go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && go build -v'
+docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp golang:1.20 bash -c 'go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v'
+
 nohup ./carservice &
 ```
+运行环境
+
+git	/	源码管理	是
+golang	1.16+	编译环境	是
+docker	18+	独立运行容器	否
+docker-compose	/	容器管理组件	否
+gcc	7.3+	编译环境依赖	是
+glibc	2.18	智能合约执行环境依赖	是
+
+https://docs.chainmaker.org.cn/recovery/%E9%80%9A%E8%BF%87%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7%E5%90%AF%E5%8A%A8%E9%93%BE.html#normalError
+
+
+```shell
+gcc --version
+# 如果gcc<7.3，则运行一下命令升级
+sudo yum install centos-release-scl
+sudo yum install devtoolset-7-gcc*
+scl enable devtoolset-7 bash
+```
+
 
 下载配置文件：
 ![download-config](images/download-config.png)
